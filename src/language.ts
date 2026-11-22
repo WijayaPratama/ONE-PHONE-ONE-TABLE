@@ -1,0 +1,255 @@
+export type Language = 'id' | 'en'
+export const languageKey = 'werewolf-language'
+let language: Language = 'id'
+
+export function setLanguage(value: Language) {
+  language = value
+  document.documentElement.lang = value
+}
+
+const english: Record<string, string> = {
+  "Pembagian kartu selesai": "Cards dealt",
+  "Lanjut ke Pengaturan": "Continue to Settings",
+  "Permainan deduksi sosial yang membuat nongkrong semakin seru. Satu HP, banyak pemain, dan penuh kecurigaan.": "A social deduction game for your next get-together. One phone, many players, and plenty of suspicion.",
+  "Lanjutkan Permainan": "Resume Game",
+  "Mulai Permainan Baru": "Start a New Game",
+  "Main Werewolf": "Play Werewolf",
+  "Cara Bermain": "How to Play",
+  "1. Moderator menyiapkan game": "1. The moderator sets up the game",
+  "Masukkan pemain dan pilih komposisi role secara manual.": "Enter the players and choose the role lineup.",
+  "2. Bagikan kartu secara rahasia": "2. Deal secret cards",
+  "Oper satu HP. Setiap pemain hanya melihat role miliknya.": "Pass one phone around. Each player sees only their own role.",
+  "3. Mainkan fase malam dan siang": "3. Play the night and day phases",
+  "Werewolf beraksi malam hari, lalu semua pemain berdiskusi dan voting di siang hari.": "Werewolves act at night. During the day, players discuss and decide who to eliminate.",
+  "Tujuan permainan": "Goal of the Game",
+  "Desa mencari Werewolf. Werewolf bertahan sampai jumlahnya menguasai desa.": "Villagers hunt the Werewolves. The Werewolves win when they match or outnumber the living Villagers.",
+  "LANGKAH 1 DARI 3": "STEP 1 OF 3",
+  "Siapa yang bermain?": "Who's Playing?",
+  "Masukkan 6 sampai 12 nama pemain.": "Enter 6 to 12 player names.",
+  "Nama harus unik.": "Names must be unique.",
+  "Tambah Pemain": "Add Player",
+  "Lanjutkan ke Role": "Continue to Roles",
+  "LANGKAH 2 DARI 3": "STEP 2 OF 3",
+  "Atur komposisi role": "Choose Roles",
+  "Bebas atur role sesuai keseruan meja kalian.": "Choose the roles your group wants to play.",
+  "Pakai Rekomendasi": "Use Recommended Lineup",
+  "Acak Komposisi": "Randomize Lineup",
+  "Total role": "Total Roles",
+  "Bagikan Role Rahasia": "Deal Secret Roles",
+  "Pastikan pemain lain tidak melihat layar.": "Make sure nobody else can see the screen.",
+  "Role rahasiamu adalah": "Your secret role is",
+  "Hafalkan role-mu sebelum menyembunyikan kartu.": "Remember your role before hiding the card.",
+  "Sembunyikan & Oper ke Pemain Berikutnya": "Hide & Pass to the Next Player",
+  "LANGKAH 3 DARI 3": "STEP 3 OF 3",
+  "Pengaturan game": "Game Settings",
+  "Atur waktu untuk membantu moderator menjaga ritme permainan.": "Set the discussion time to help the moderator keep the game moving.",
+  "Efek suara": "Sound Effects",
+  "Notifikasi pergantian fase": "Phase change notifications",
+  "Ringkasan permainan": "Game Summary",
+  "Masuk Dashboard Moderator": "Open Moderator Dashboard",
+  "RAHASIA MODERATOR — JANGAN PERLIHATKAN LAYAR INI KEPADA PEMAIN.": "MODERATOR ONLY — DO NOT SHOW THIS SCREEN TO PLAYERS.",
+  "DASHBOARD MODERATOR": "MODERATOR DASHBOARD",
+  "Masih hidup": "Alive",
+  "Meninggal": "Eliminated",
+  "Checklist malam": "Night Checklist",
+  "Resolusi malam": "Night Resolution",
+  "Malam belum dimulai": "Night Has Not Started",
+  "Aksi tanpa role aktif akan dilewati otomatis.": "Roles outside this game's lineup are skipped automatically.",
+  "Mulai Fase Malam": "Start Night Phase",
+  "HASIL PEMERIKSAAN RAHASIA": "SECRET INVESTIGATION RESULT",
+  "Seer Tidur — Lanjutkan": "Seer, Go to Sleep — Continue",
+  "KONFIRMASI SERANGAN": "CONFIRM ATTACK",
+  "Ubah Target": "Change Target",
+  "Konfirmasi Serangan": "Confirm Attack",
+  "RINGKASAN RAHASIA MODERATOR": "PRIVATE MODERATOR SUMMARY",
+  "Target serangan:": "Attack target:",
+  "Target perlindungan:": "Protected player:",
+  "Konfirmasi Hasil Malam": "Confirm Night Results",
+  "Hasil malam sudah siap": "Night Results Are Ready",
+  "Informasi rahasia tersimpan di log moderator. Anda dapat mengumumkan hasil pada pagi hari.": "Private details are in the moderator log. You can announce the public results in the morning.",
+  "Tutup Malam": "End Night",
+  "Pemain": "Player",
+  "Riwayat kejadian rahasia": "Private Event Log",
+  "Belum ada kejadian.": "No events yet.",
+  "Akhiri & Mulai Game Baru": "End & Start a New Game",
+  "Tutup": "Close",
+  "PAGI TELAH TIBA": "MORNING HAS ARRIVED",
+  "Semalam,": "Last night,",
+  "ditemukan tereliminasi.": "was found eliminated.",
+  "Moderator menyimpan detail permainan secara rahasia.": "The moderator keeps game details private.",
+  "Diskusi Siang": "Day Discussion",
+  "Diskusikan langsung di meja, lalu tentukan siapa yang dicurigai.": "Discuss at the table and decide whom you suspect.",
+  "Jeda": "Pause",
+  "Mulai": "Start",
+  "Lewati": "Skip",
+  "Catat Keputusan Meja": "Record Table Decision",
+  "Pemain yang masih hidup": "Living Players",
+  "RAHASIA MODERATOR — KEPUTUSAN MEJA": "MODERATOR ONLY — TABLE DECISION",
+  "SETELAH DISKUSI": "AFTER DISCUSSION",
+  "Pilih keputusan hari ini": "Choose Today's Outcome",
+  "Pemain sudah berdiskusi di meja. Moderator cukup mencatat hasil kesepakatan.": "Record the decision the players reached at the table.",
+  "Lewati eliminasi hari ini": "Skip Today's Elimination",
+  "Lanjutkan ke Konfirmasi": "Continue to Confirmation",
+  "RAHASIA MODERATOR — KONFIRMASI KEPUTUSAN": "MODERATOR ONLY — CONFIRM DECISION",
+  "Keputusan Siang": "Day Decision",
+  "Perubahan status baru diterapkan setelah moderator mengonfirmasi.": "Player status changes after the moderator confirms.",
+  "Kembali": "Back",
+  "RAHASIA MODERATOR": "MODERATOR ONLY",
+  "HUNTER TERELIMINASI": "HUNTER ELIMINATED",
+  "Konfirmasi Tembakan Hunter": "Confirm Hunter's Shot",
+  "Tidak Menembak": "Decline Shot",
+  "Pengungkapan role": "Role Reveal",
+  "Riwayat permainan": "Game History",
+  "Main Lagi dengan Pemain Sama": "Play Again with the Same Players",
+  "Ubah Pemain": "Edit Players",
+  "Tidak ada target yang dapat dipilih. Bacakan instruksi seperti biasa, lalu lanjutkan.": "There are no eligible targets. Read the instructions as usual, then continue.",
+  "Dipilih": "Selected",
+  "Kemampuan:": "Ability:",
+  "Mengerti": "Got It",
+  "Penyembuh": "Healing",
+  "Racun": "Poison",
+  "Tidak ada aksi tersedia. Bacakan instruksi seperti biasa, lalu lanjutkan.": "No action is available. Read the instructions as usual, then continue.",
+  "Konfirmasi Pilihan": "Confirm Selection",
+  "Beranda": "Home",
+  "Hapus pemain": "Remove player",
+  "Minimal 6 pemain diperlukan.": "At least 6 players are required.",
+  "Lengkapi semua nama dan pastikan tidak ada yang sama.": "Enter a unique name for every player.",
+  "Komposisi siap dibagikan.": "The lineup is ready to deal.",
+  "Total role harus sama dengan jumlah pemain.": "The role count must match the player count.",
+  "Minimal harus ada 1 Werewolf.": "At least one member of the Werewolf pack is required.",
+  "Diskusi siang": "Day discussion",
+  "detik": "seconds",
+  "Dilewati": "Skipped",
+  "Berjalan": "In progress",
+  "Selesai": "Done",
+  "Menunggu": "Pending",
+  "✓ Selesai": "✓ Done",
+  "● Hidup": "● Alive",
+  "● Mati": "● Eliminated",
+  "Hidup": "Alive",
+  "Mati": "Eliminated",
+  "Tidak ada korban.": "No casualties.",
+  "adalah Werewolf.": "is a Werewolf.",
+  "terbaca sebagai Warga Desa.": "appears to be a Villager.",
+  "SEER BANGUN": "SEER, WAKE UP",
+  "GUARDIAN BANGUN": "GUARDIAN, WAKE UP",
+  "WEREWOLF BANGUN": "WEREWOLVES, WAKE UP",
+  "Guardian boleh melindungi dirinya sendiri.": "The Guardian may protect themselves.",
+  "Minta Seer membuka mata, lalu pilih pemain yang diperiksa.": "Ask the Seer to open their eyes, then select the player they investigate.",
+  "Werewolf berdiskusi lalu moderator memilih satu korban.": "Ask the Werewolves to agree on a target, then record their choice.",
+  "Guardian Tidur — Lanjutkan": "Guardian, Go to Sleep — Continue",
+  "Semalam tidak ada pemain yang tereliminasi.": "Nobody was eliminated last night.",
+  "Lanjutkan ke Aksi Hunter": "Continue to Hunter Action",
+  "Mulai Diskusi Siang": "Start Day Discussion",
+  "Tidak ada pemain yang dieliminasi hari ini.": "Nobody will be eliminated today.",
+  "Konfirmasi Lewati Eliminasi": "Confirm No Elimination",
+  "Permainan selesai.": "The game is over.",
+  "Lanjutkan": "Continue",
+  "Lewati Aksi": "Skip Action",
+  "Bukan Seer": "Not the Seer",
+  "WEREWOLF — TARGET KEDUA": "WEREWOLVES — SECOND TARGET",
+  "Wolfcub gugur pada ronde sebelumnya. Pilih target tambahan.": "The Wolfcub fell last round. Choose an additional target.",
+  "Mulai permainan baru? Sesi permainan saat ini akan dihapus.": "Start a new game? This will clear the current session.",
+  "Netral": "Neutral",
+  "Warga": "Villagers",
+  "Desa": "Villagers",
+  "Pagi": "Morning",
+  "Malam berikutnya": "Next Night",
+  "Aksi Hunter": "Hunter Action",
+  "Voting siang": "Day decision",
+  "Efek Hunter": "Hunter's shot",
+  "Racun Witch": "Witch's poison",
+  "Patah hati": "Heartbreak",
+  "Tim Desa menang! Semua Werewolf telah dieliminasi.": "The Villagers win! All Werewolf threats have been eliminated.",
+  "Tim Werewolf menang! Werewolf telah menguasai desa.": "The Werewolves win! They have taken over the village.",
+  "Tidak memiliki kemampuan khusus. Bertugas menemukan Werewolf melalui diskusi dan voting.": "No special ability. Find the Werewolves through discussion and voting.",
+  "Diskusikan petunjuk dan gunakan suaramu untuk melindungi desa.": "Discuss clues and use your vote to protect the village.",
+  "Mengetahui identitas sesama Werewolf. Pada malam hari, mereka menentukan satu target.": "Knows the other Werewolves. The pack chooses a target at night.",
+  "Temukan rekanmu dan singkirkan warga tanpa ketahuan.": "Find your packmates and eliminate Villagers without being caught.",
+  "Setiap malam dapat memeriksa satu pemain untuk mengetahui apakah pemain tersebut Werewolf atau bukan.": "Investigate one player each night to see whether they are a Werewolf.",
+  "Pilih satu pemain untuk diperiksa setiap malam.": "Choose one player to investigate each night.",
+  "Setiap malam dapat memilih satu pemain untuk dilindungi dari serangan Werewolf.": "Protect one player from Werewolf attacks each night.",
+  "Pilih satu pemain untuk dilindungi setiap malam.": "Choose one player to protect each night.",
+  "Ketika tereliminasi, dapat memilih satu pemain lain untuk ikut tereliminasi.": "When eliminated, you may eliminate one other player.",
+  "Saat tereliminasi, bawa satu pemain lain bersamamu.": "Take another player with you when eliminated.",
+  "Menang sendiri jika berhasil dieliminasi melalui voting siang hari.": "Wins alone if eliminated by the day vote.",
+  "Yakinkan desa untuk memilihmu pada siang hari.": "Convince the village to eliminate you during the day.",
+  "Dua ramuan sekali pakai. Pilih paling banyak satu per malam.": "Two single-use potions. Use at most one per night.",
+  "Pasang penyembuh pada satu pemain hidup. Ramuan terpakai jika ia diserang. Mulai malam kedua, racun bisa mengeliminasi pemain meski dilindungi Guardian.": "Give a living player the healing potion. It is consumed if they are attacked. From night two, poison can eliminate a player even through Guardian protection.",
+  "Memilih dua Lovers pada malam pertama.": "Choose two Lovers on the first night.",
+  "Moderator mempertemukan pasangan secara rahasia. Jika satu gugur, pasangannya ikut gugur.": "The moderator privately introduces the Lovers. If one falls, the other falls too.",
+  "Suara Mayor berbobot dua saat keputusan meja.": "The Mayor's vote counts twice.",
+  "Moderator menerapkan bobot suara saat diskusi langsung.": "The moderator applies this rule at the table.",
+  "Pemimpin kawanan.": "Leader of the pack.",
+  "Ikut memilih korban. Pemeriksaan Seer membaca dirinya sebagai Villager.": "Helps choose the target. Appears as a Villager to the Seer.",
+  "Anggota kawanan.": "Member of the pack.",
+  "Jika gugur, kawanan dapat menyerang dua target berbeda malam berikutnya.": "If eliminated, the pack can attack two different targets the following night.",
+  "Membantu tim Werewolf mencari Seer.": "Helps the Werewolves find the Seer.",
+  "Periksa satu pemain hidup tiap malam untuk mengetahui apakah ia Seer.": "Check one living player each night to see whether they are the Seer.",
+  "Mewarisi role pemain pilihannya setelah pemain itu gugur.": "Inherits the chosen player's role when that player falls.",
+  "Tentukan satu pemain di malam pertama. Setelah mewarisi role, ikuti kondisi kemenangan role itu.": "Choose a player on the first night. After inheriting their role, follow that role's win condition.",
+  "Giliran": "Turn:",
+  "KARTU": "CARD",
+  "DARI": "OF",
+  "RONDE": "ROUND",
+  "Ronde": "Round",
+  "Saya": "I am",
+  ", Buka Kartu": ", Reveal My Card",
+  "pemain": "players",
+  "jenis role": "role types",
+  "Role tiap pemain tetap rahasia": "Individual roles stay secret",
+  "Hasil:": "Result:",
+  "Eliminasi": "Eliminate",
+  "Berakhir pada ronde": "Ended in round",
+  "Tim": "Team",
+  "Status:": "Status:",
+  "Hasil rahasia:": "Private result:",
+  "Tunjukkan secara rahasia kepada": "Privately tell",
+  "bahwa mereka berpasangan.": "that they are Lovers.",
+  "dapat membawa satu pemain hidup bersamanya.": "may eliminate one living player.",
+  "Apakah Werewolf sepakat menyerang": "Do the Werewolves agree to attack",
+  "Pemain {0}": "Player {0}",
+  "Tambah {0}": "Add {0}",
+  "Guardian tidak dapat melindungi {0} lagi malam ini.": "The Guardian cannot protect {0} again tonight.",
+  "{0} akan dieliminasi.": "{0} will be eliminated.",
+  "Konfirmasi Eliminasi {0}": "Confirm Elimination of {0}",
+  "{0} BANGUN": "{0}, WAKE UP"
+}
+
+export function t(value: string): string {
+  return language === 'en' ? english[value] ?? value : value
+}
+
+export function phrase(parts: TemplateStringsArray, ...values: unknown[]) {
+  const key = parts.map((part, i) => i === 0 ? part : `{${i - 1}}${part}`).join('')
+  return t(key).replace(/\{(\d+)\}/g, (_, index: string) => String(values[Number(index)] ?? ''))
+}
+
+export function roleName(name?: string) {
+  return language === 'en' ? name?.split(' (')[0] : name
+}
+
+export function gameText(value: string): string {
+  if (language !== 'en') return value
+  const translated = t(value)
+  if (translated !== value) return translated
+  const heading = /^(Ronde|Malam|Siang) (\d+): (.*)$/.exec(value)
+  if (heading) {
+    const label = { Ronde: 'Round', Malam: 'Night', Siang: 'Day' }[heading[1]]
+    return `${label} ${heading[2]}: ${gameText(heading[3])}`
+  }
+  return value
+    .replace(/^Resolusi Malam$/, 'Night Resolution')
+    .replace(/^Malam — (.*)$/, 'Night — $1')
+    .replace(/^(.+) \(Tanner\) menang sendiri karena berhasil dieliminasi melalui keputusan siang\.$/, '$1 (Tanner) wins alone after being eliminated by the day decision.')
+    .replace(/^(.+) gugur \((.+)\)\.$/, (_, name, cause) => `${name} was eliminated (${t(cause)}).`)
+    .replace(/^(.+) mewarisi role (.+)\.$/, '$1 inherited the role of $2.')
+    .replace(/^Serangan terhadap (.+) berhasil dicegah\.$/, 'The attack on $1 was prevented.')
+    .replace(/^Seer memeriksa (.+)\.$/, 'The Seer investigated $1.')
+    .replace(/^Guardian melindungi (.+)\.$/, 'The Guardian protected $1.')
+    .replace(/^Werewolf memilih (.+) sebagai target\.$/, 'The Werewolves targeted $1.')
+    .replace(/^(.+) memilih (.+)\.$/, '$1 selected $2.')
+    .replace(/^Hasil Sorcerer: (.+)\.$/, (_, result) => `Sorcerer result: ${t(result)}.`)
+    .replace(/^meja memutuskan melewati eliminasi\.$/, 'The table skipped elimination.')
+    .replace(/^meja memutuskan eliminasi (.+)\.$/, 'The table chose to eliminate $1.')
+}

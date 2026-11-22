@@ -1,0 +1,10 @@
+export type RoleId = 'villager' | 'werewolf' | 'seer' | 'guardian' | 'hunter' | 'tanner' | 'witch' | 'cupid' | 'mayor' | 'alpha' | 'wolfcub' | 'sorcerer' | 'doppelganger'
+export type Page = 'landing' | 'howto' | 'players' | 'roles' | 'deal' | 'settings' | 'dashboard' | 'morning' | 'discussion' | 'voting' | 'voteResult' | 'hunter' | 'gameOver'
+export type NightStage = 'idle' | 'seer' | 'seerResult' | 'guardian' | 'werewolf' | 'wolfConfirm' | 'resolution' | 'morning' | 'witch' | 'cupid' | 'sorcerer' | 'doppelganger' | 'wolfSecond'
+export type EliminationCause = 'Werewolf' | 'Voting siang' | 'Efek Hunter' | 'Racun Witch' | 'Patah hati'
+export interface Player { id: string; username: string; role?: RoleId; isAlive: boolean; eliminatedBy?: EliminationCause; eliminatedAtNight?: boolean; eliminatedRound?: number; originalRole?: RoleId; loverId?: string; copyId?: string; saveUsed?: boolean; poisonUsed?: boolean }
+export interface RoleDefinition { id: RoleId; name: string; description: string; ability: string; team: 'Desa' | 'Werewolf' | 'Netral' }
+export interface Settings { nightDuration: number; dayDuration: number; votingDuration: number; soundEnabled: boolean }
+export interface NightState { stage: NightStage; seerTarget?: string; doctorTarget?: string; wolfTarget?: string; secondWolfTarget?: string; potion?: { actorId: string; targetId: string; kind: 'save' | 'poison' }; lastDoctorTarget?: string; timerRemaining: number; timerRunning: boolean; timerStartedAt?: number }
+export interface DayState { morningVictimId?: string; morningVictimIds?: string[]; hunterQueue?: string[]; discussionRemaining: number; discussionRunning: boolean; discussionStartedAt?: number; votes: Record<string, string | 'abstain'>; voteIndex: number; pendingEliminationId?: string; winner?: string; hunterSourceId?: string }
+export interface GameState { players: Player[]; roleConfiguration: Record<RoleId, number>; currentPhase: string; currentRound: number; settings: Settings; events: string[]; dealtCount: number; page: Page; night: NightState; day: DayState }

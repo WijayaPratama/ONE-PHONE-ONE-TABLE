@@ -1,0 +1,28 @@
+{
+  "name": "one-phone-one-table",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "autoprefixer": "^10.4.20",
+    "lucide-react": "latest",
+    "postcss": "^8.4.49",
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwindcss": "^3.4.17",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "vitest": "^5.1.1"
+  }
+}
