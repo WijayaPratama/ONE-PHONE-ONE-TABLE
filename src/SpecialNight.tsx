@@ -39,10 +39,12 @@ export function SpecialNight({ game, update, advance }: { game: GameState; updat
     </div>}
     {result ? <p>Hasil rahasia: {names} — {result}</p> : <>
       {!candidates.length && <p className="text-sm">{t("Tidak ada aksi tersedia. Bacakan instruksi seperti biasa, lalu lanjutkan.")}</p>}
-      {candidates.map(p => <button key={p.id} className={targets.includes(p.id) ? 'btn-primary' : 'btn-secondary'} aria-pressed={targets.includes(p.id)} onClick={() => setTargets(stage !== 'cupid' ? [p.id] : targets.includes(p.id) ? targets.filter(id => id !== p.id) : [...targets.slice(-1), p.id])}>{p.username}</button>)}
+      {candidates.map(p => <button key={p.id} className={targets.includes(p.id) ? 'btn-secondary !border-cyan-400 !bg-cyan-950 text-cyan-100' : 'btn-secondary'} aria-pressed={targets.includes(p.id)} onClick={() => setTargets(stage !== 'cupid' ? [p.id] : targets.includes(p.id) ? targets.filter(id => id !== p.id) : [...targets.slice(-1), p.id])}>{p.username}</button>)}
       {stage === 'cupid' && targets.length === 2 && <p>{t("Tunjukkan secara rahasia kepada")} {names} bahwa mereka berpasangan.</p>}
-      {!!candidates.length && <button className="btn-primary" disabled={targets.length !== (stage === 'cupid' ? 2 : 1)} onClick={confirm}>{t("Konfirmasi Pilihan")}</button>}
     </>}
-    <button className="btn-secondary" onClick={() => advance()}>{result || !candidates.length ? t('Lanjutkan') : t('Lewati Aksi')}</button>
+    <div className={!result && candidates.length ? 'grid grid-cols-2 gap-2' : undefined}>
+      {!result && !!candidates.length && <button className="btn-primary !px-2 text-sm" disabled={targets.length !== (stage === 'cupid' ? 2 : 1)} onClick={confirm}>{t('Konfirmasi Pilihan')}</button>}
+      <button className="btn-secondary !border-amber-700 !bg-amber-950 !px-2 text-sm !text-amber-100 hover:!bg-amber-900" onClick={() => advance()}>{result || !candidates.length ? t('Lanjutkan') : t('Lewati Aksi')}</button>
+    </div>
   </section>
 }

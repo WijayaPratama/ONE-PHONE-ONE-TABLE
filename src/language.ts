@@ -8,6 +8,8 @@ export function setLanguage(value: Language) {
 }
 
 const english: Record<string, string> = {
+  "Jumlah pemain": "Number of players",
+  "Masukkan jumlah pemain antara 6 dan 30.": "Enter a player count between 6 and 30.",
   "Pembagian kartu selesai": "Cards dealt",
   "Lanjut ke Pengaturan": "Continue to Settings",
   "Permainan deduksi sosial yang membuat nongkrong semakin seru. Satu HP, banyak pemain, dan penuh kecurigaan.": "A social deduction game for your next get-together. One phone, many players, and plenty of suspicion.",

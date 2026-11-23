@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { blankComposition, recommendedPreset } from './data'
 import { checkWinner, voteSummary } from './day'
-import { defaultNight, nextAvailableStage, nightOutcome } from './night'
+import { defaultNight, nextAvailableStage, nightOutcome, startStage } from './night'
 import { pauseTimer, remainingTime } from './timer'
 import { eliminate, hasWolfRage, resolveAbilities } from './abilities'
 import type { GameState, Player } from './types'
@@ -10,6 +10,15 @@ const player = (id: string, role: Player['role'], isAlive = true): Player => ({ 
 const game = (players: Player[]): GameState => ({ players, roleConfiguration: blankComposition(), currentPhase: 'test', currentRound: 1, settings: { nightDuration: 90, dayDuration: 180, votingDuration: 60, soundEnabled: false }, events: [], dealtCount: 0, page: 'dashboard', night: defaultNight(90), day: { discussionRemaining: 180, discussionRunning: false, votes: {}, voteIndex: 0 } })
 
 describe('aturan inti Werewolf', () => {
+  it('memajukan semua tahap malam ke urutan berikutnya tanpa target opsional', () => {
+    const roles: Player['role'][] = ['cupid', 'doppelganger', 'seer', 'guardian', 'sorcerer', 'werewolf', 'witch']
+    let state = game(roles.map((role, index) => player(String(index), role)))
+    for (const stage of ['cupid', 'doppelganger', 'seer', 'guardian', 'sorcerer', 'werewolf', 'witch', 'resolution'] as const) {
+      expect(nextAvailableStage(state, state.night.stage)).toBe(stage)
+      state = startStage(state, stage)
+    }
+    expect(resolveAbilities(state).fallen).toEqual([])
+  })
   it('racun menembus Guardian dan penyembuh hanya habis jika target diserang', () => {
     const state = game([player('w', 'witch'), player('a', 'alpha'), player('v', 'villager')])
     state.night.doctorTarget = 'v'
