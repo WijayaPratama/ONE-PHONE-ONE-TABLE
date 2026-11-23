@@ -64,7 +64,9 @@ export default function Undercover() {
     setOpen(false)
     setSelected(undefined)
     setGuess('')
-    setSession({ players, words: pool[Math.floor(Math.random() * pool.length)], phase: 'deal', card: 0, round: 1, order: shuffle(players.map((_, i) => i)) })
+    const [first, second] = pool[Math.floor(Math.random() * pool.length)]
+    const words: Pair = Math.random() < 0.5 ? [first, second] : [second, first]
+    setSession({ players, words, phase: 'deal', card: 0, round: 1, order: shuffle(players.map((_, i) => i)) })
   }
   const savePair = () => {
     const cleaned: Pair = [pair[0].trim(), pair[1].trim()]
@@ -162,9 +164,9 @@ export default function Undercover() {
       </div>
       <details className="card">
         <summary className="cursor-pointer font-semibold">{l('Pasangan kata', 'Word pairs')} · {defaultPairs.length + custom.length}</summary>
-        <p className="my-3 text-sm text-slate-300">{l('Pasangan dipilih acak. Tambahkan dua kata berbeda agar ikut masuk undian.', 'A pair is drawn at random. Add two distinct words to include them in the pool.')}</p>
+        <p className="my-3 text-sm text-slate-300">{l('Pasangan kata dan pembagiannya ke Civilian dan Undercover diacak setiap permainan.', 'The pair and its assignment to Civilian and Undercover are randomized each game.')}</p>
         <div className="grid gap-2 sm:grid-cols-2">
-          {pair.map((word, i) => <label key={i} className="label">{i === 0 ? l('Kata Civilian', 'Civilian word') : l('Kata Undercover', 'Undercover word')}
+          {pair.map((word, i) => <label key={i} className="label">{l('Kata', 'Word')} {i + 1}
             <input className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950 p-3" maxLength={48} value={word} onChange={event => {
               setPairFeedback(undefined)
               setPair(i === 0 ? [event.target.value, pair[1]] : [pair[0], event.target.value])
