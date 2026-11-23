@@ -8,6 +8,7 @@ export function setLanguage(value: Language) {
 }
 
 const english: Record<string, string> = {
+  "masukkan nama": "enter name",
   "Jumlah pemain": "Number of players",
   "Masukkan jumlah pemain antara 6 dan 30.": "Enter a player count between 6 and 30.",
   "Pembagian kartu selesai": "Cards dealt",

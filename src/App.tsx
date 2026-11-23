@@ -44,6 +44,7 @@ export default function App() {
   const current = game.players[game.dealtCount]
 
   return <main className="app">
+    <a className="mb-2 inline-block rounded-lg py-2 text-sm text-violet-200" href="#games">← {locale === 'en' ? 'Game menu' : 'Menu game'}</a>
     <label className="mb-4 flex items-center justify-end gap-2 text-sm text-slate-300"><span>{locale === 'en' ? 'Language' : 'Bahasa'}</span><select className="min-h-10 rounded-lg bg-slate-800 px-2" value={locale} onChange={event => changeLanguage(event.target.value as Language)}><option value="id">Indonesia</option><option value="en">English</option></select></label>
     {game.page !== 'landing' && <button onClick={() => navigate(game.page === 'roles' ? 'players' : game.page === 'settings' ? 'deal' : 'landing')} className="mb-5 flex min-h-12 items-center gap-2 text-sm text-slate-300"><ChevronLeft size={18}/> {['players', 'roles', 'settings'].includes(game.page) ? t('Kembali') : t('Beranda')}</button>}
     {game.page === 'landing' && <Landing game={game} go={navigate} fresh={fresh} />}
@@ -109,7 +110,7 @@ function Players({ game, update, valid, go }: { game: GameState; update: (p: Par
         const label = phrase`Pemain ${index + 1}`
         return <label key={player.id} className="min-w-0">
           <span className="label">{label}</span>
-          <input className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 outline-none focus:border-violet-500" value={player.username} placeholder={label} onChange={event => change(index, event.target.value)} />
+          <input className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 outline-none focus:border-violet-500" value={player.username} placeholder={t('masukkan nama')} onChange={event => change(index, event.target.value)} />
           {!!names[index] && names.indexOf(names[index]) !== index && <span className="text-xs text-red-400">{t('Nama harus unik.')}</span>}
         </label>
       })}
