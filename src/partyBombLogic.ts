@@ -14,6 +14,7 @@ export const wireLabel = (index: number) => String.fromCharCode(65 + index)
 
 export interface Clue {
   text: string
+  family: string
   accepts: (sequence: number[]) => boolean
 }
 
@@ -39,15 +40,28 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
   const used = new Set<string>()
   function positionsForAgents() { return Array.from({ length: agents }, (_, i) => (i + offset) % agents) }
 
-  const redCount = wires.filter(color => color === 'Merah').length
-  const yellow = wires.indexOf('Kuning')
-  const pinFacts = [
-    { digit: String(redCount), text: 'Digit ke-1 PIN adalah jumlah kabel Merah.' },
-    yellow >= 0 && wires.lastIndexOf('Kuning') === yellow
-      ? { digit: String(yellow + 1), text: 'Digit ke-2 PIN adalah posisi kabel Kuning.' }
-      : { digit: serial[1], text: 'Digit ke-2 PIN adalah angka tengah nomor seri.' },
-    { digit: serial[2], text: 'Digit ke-3 PIN adalah angka terakhir nomor seri.' },
-  ].slice(0, config.digits)
+  const serialDigits = [...serial].map(Number)
+  const reference = index(positions.length)
+  const order = index(targets.length)
+  const uniqueColors = colors.filter(color => wires.filter(wire => wire === color).length === 1)
+  const uniqueColor = uniqueColors[index(uniqueColors.length)]
+  const formulas = [
+    { family: 'target', value: targets[order] + 1, rule: `nomor posisi Kabel ke-${order + 1}` },
+    index(2) === 0
+      ? { family: 'arithmetic', value: (serialDigits[0] + serialDigits[2]) % 10, rule: 'satuan dari jumlah angka pertama dan terakhir nomor seri' }
+      : { family: 'arithmetic', value: Math.abs(reference - targets[order]), rule: `selisih posisi kabel ${wireLabel(reference)} dan Kabel ke-${order + 1}` },
+    index(2) === 0
+      ? { family: 'condition', value: positions.filter(i => i % 2 === 1).length, rule: 'jumlah kabel di posisi genap' }
+      : { family: 'condition', value: positions.filter(i => i < reference).length, rule: `jumlah kabel di atas kabel ${wireLabel(reference)}` },
+    index(2) === 0
+      ? { family: 'serial', value: Math.max(...serialDigits), rule: 'angka terbesar pada nomor seri' }
+      : { family: 'serial', value: (serialDigits[0] + 8) % 10, rule: 'satuan dari angka pertama nomor seri ditambah 8' },
+  ]
+  if (uniqueColor) formulas.push({ family: 'letter', value: wires.indexOf(uniqueColor) + 1, rule: `posisi kabel ${uniqueColor}` })
+  const pinFacts = Array.from({ length: config.digits }, (_, i) => {
+    const [formula] = formulas.splice(index(formulas.length), 1)
+    return { family: formula.family, digit: String(formula.value), text: `Digit ke-${i + 1} PIN adalah ${formula.rule}.` }
+  })
   pinFacts.forEach((fact, agent) => hands[agent].push(fact.text))
 
   const signatures = new Map<Clue, string>()
@@ -59,7 +73,8 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
     return value
   }
   const canAdd = (agent: number, clue: Clue) => {
-    if (hands[agent].length >= capacity[agent] || used.has(signature(clue))) return false
+    const mask = signature(clue)
+    if (hands[agent].length >= capacity[agent] || used.has(mask) || !mask.includes('0')) return false
     const left = sequences.filter(sequence => clue.accepts(sequence) && cards[agent].every(fact => fact.accepts(sequence)))
     return targets.every((_, order) => new Set(left.map(sequence => sequence[order])).size > 1)
   }
@@ -73,25 +88,27 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
   const extras: Clue[] = []
   targets.forEach((target, order) => {
     const label = `Kabel ke-${order + 1}`
-    const fact = (text: string, allowed: number[]): Clue => ({ text: `${label} ${text}`, accepts: sequence => allowed.includes(sequence[order]) })
+    const fact = (text: string, allowed: number[], family = 'label'): Clue => ({ text: `${label} ${text}`, family, accepts: sequence => allowed.includes(sequence[order]) })
     const exclusion = (excluded: number[]) => fact(`bukan kabel ${excluded.map(wireLabel).join(' maupun ')}.`, positions.filter(i => !excluded.includes(i)))
     const patterns = [
-      { text: `berada di posisi ${target % 2 ? 'genap' : 'ganjil'}.`, allowed: positions.filter(i => i % 2 === target % 2) },
-      { text: `berwarna ${wires[target]}.`, allowed: positions.filter(i => wires[i] === wires[target]) },
+      { family: 'position', text: `berada di posisi ${target % 2 ? 'genap' : 'ganjil'}.`, allowed: positions.filter(i => i % 2 === target % 2) },
+      { family: 'position', text: `berada di tiga posisi ${target < 3 ? 'teratas' : 'terbawah'}.`, allowed: positions.filter(i => target < 3 ? i < 3 : i >= wires.length - 3) },
+      { family: 'color', text: `berwarna ${wires[target]}.`, allowed: positions.filter(i => wires[i] === wires[target]) },
       ...colors.filter(color => color !== wires[target]).map(color => ({
-        text: `bukan warna ${color}.`, allowed: positions.filter(i => wires[i] !== color),
+        family: 'color', text: `bukan warna ${color}.`, allowed: positions.filter(i => wires[i] !== color),
       })),
       ...colors.flatMap(color => {
         const adjacent = positions.filter(i => wires[i - 1] === color || wires[i + 1] === color)
         const below = positions.filter(i => wires[i - 1] === color)
         return [
-          { text: `bersebelahan dengan kabel ${color}.`, allowed: adjacent },
-          { text: `berada tepat di bawah kabel ${color}.`, allowed: below },
+          { family: 'neighbor', text: `bersebelahan dengan kabel ${color}.`, allowed: adjacent },
+          { family: 'neighbor', text: `tidak bersebelahan dengan kabel ${color}.`, allowed: positions.filter(i => !adjacent.includes(i)) },
+          { family: 'neighbor', text: `berada tepat di bawah kabel ${color}.`, allowed: below },
         ]
       }),
     ].filter(pattern => pattern.allowed.includes(target) && pattern.allowed.length > 1 && pattern.allowed.length < wires.length)
     const pattern = patterns[index(patterns.length)]
-    const core = [fact(pattern.text, pattern.allowed), exclusion(pattern.allowed.filter(i => i !== target))]
+    const core = [fact(pattern.text, pattern.allowed, pattern.family), exclusion(pattern.allowed.filter(i => i !== target))]
     const coreAgents = new Set<number>()
     for (const clue of core) {
       const agent = positionsForAgents().sort((a, b) => hands[a].length - hands[b].length)
@@ -100,7 +117,16 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
       add(agent, clue)
       coreAgents.add(agent)
     }
-    extras.push(...patterns.map(candidate => fact(candidate.text, candidate.allowed)))
+    extras.push(...patterns.map(candidate => fact(candidate.text, candidate.allowed, candidate.family)))
+    for (const color of colors) {
+      const count = wires.filter(wire => wire === color).length
+      if (count <= 1 || wires[target] === color) continue
+      extras.push({
+        family: 'condition',
+        text: `Jika kabel ${color} lebih dari satu, ${label} bukan ${color}.`,
+        accepts: sequence => wires[sequence[order]] !== color,
+      })
+    }
     const alternatives = positions.filter(i => i !== target)
     for (let mask = 1; mask < (1 << alternatives.length) - 1; mask++) {
       extras.push(exclusion(alternatives.filter((_, i) => mask & (1 << i))))
@@ -109,21 +135,29 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
   if (targets.length === 2) {
     const lower = targets[1] > targets[0]
     extras.unshift({
+      family: 'relation',
       text: `Kabel ke-2 berada lebih ${lower ? 'bawah' : 'atas'} dari kabel ke-1.`,
       accepts: sequence => (sequence[1] > sequence[0]) === lower,
+    })
+    const sameColor = wires[targets[0]] === wires[targets[1]]
+    extras.unshift({
+      family: 'relation',
+      text: `Warna Kabel ke-2 ${sameColor ? 'sama dengan' : 'berbeda dari'} Kabel ke-1.`,
+      accepts: sequence => (wires[sequence[0]] === wires[sequence[1]]) === sameColor,
     })
   }
 
   for (const agent of positionsForAgents()) {
     while (hands[agent].length < capacity[agent]) {
       const eligible = extras.filter(clue => canAdd(agent, clue))
-      const varied = eligible.filter(clue => !clue.text.includes('bukan kabel'))
-      const pool = varied.length ? varied : eligible
+      const fresh = eligible.filter(clue => !clues.some(used => used.family === clue.family))
+      const varied = eligible.filter(clue => !cards[agent].some(used => used.family === clue.family))
+      const pool = fresh.length ? fresh : varied.length ? varied : eligible
       if (!pool.length) throw new Error('No distinct cable clue remains for this agent')
       add(agent, pool[index(pool.length)])
     }
   }
-  return { wires, serial, targets, pin: pinFacts.map(fact => fact.digit).join(''), clues, hands }
+  return { wires, serial, targets, pin: pinFacts.map(fact => fact.digit).join(''), pinFacts, clues, hands }
 }
 
 export type Mission = ReturnType<typeof createMission>

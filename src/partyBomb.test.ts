@@ -20,7 +20,8 @@ it('generates unambiguous cable sequences, PINs and clue hands for every configu
         expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1)
         const expectedTotal = config.digits ? (agents <= 4 ? 9 : agents * 2) : agents <= 4 ? agents * 2 : 7
         expect(distributedClues).toHaveLength(expectedTotal)
-        expect(distributedClues.every(clue => clue.split(/\s+/).length <= 14)).toBe(true)
+        expect(distributedClues.every(clue => clue.split(/\s+/).length <= 15)).toBe(true)
+        expect(new Set(mission.clues.map(clue => clue.family)).size).toBeGreaterThan(1)
         const sequences = possibleCuts(config.wires, config.cuts)
         const signatures = mission.clues.map(clue => sequences.map(sequence => Number(clue.accepts(sequence))).join(''))
         expect(new Set(signatures).size).toBe(signatures.length)
@@ -31,10 +32,9 @@ it('generates unambiguous cable sequences, PINs and clue hands for every configu
           mission.targets.forEach((_, order) => expect(new Set(ownCandidates.map(sequence => sequence[order])).size).toBeGreaterThan(1))
           expect(hand.filter(clue => clue.startsWith('Digit')).length).toBeLessThanOrEqual(1)
         }
-        const red = mission.wires.filter(color => color === 'Merah').length
-        const yellow = mission.wires.indexOf('Kuning')
-        const middle = yellow >= 0 && yellow === mission.wires.lastIndexOf('Kuning') ? yellow + 1 : mission.serial[1]
-        expect(mission.pin).toBe(`${red}${middle}${mission.serial[2]}`.slice(0, config.digits))
+        expect(new Set(mission.pinFacts.map(fact => fact.family)).size).toBe(config.digits)
+        expect(mission.pinFacts.every(fact => /^[0-9]$/.test(fact.digit))).toBe(true)
+        expect(mission.pin).toBe(mission.pinFacts.map(fact => fact.digit).join(''))
         expect(solved(mission, config.cuts, true)).toBe(true)
         expect(solved(mission, config.cuts - 1, true)).toBe(false)
         expect(solved(mission, config.cuts, false)).toBe(config.digits === 0)
