@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { createMission, modes, solved, type Difficulty } from './partyBombLogic'
+import { createMission, modes, possibleCuts, solved, type Difficulty } from './partyBombLogic'
 
 it('generates unambiguous cable sequences, PINs and clue hands for every configuration', () => {
   let seed = 821
@@ -7,32 +7,38 @@ it('generates unambiguous cable sequences, PINs and clue hands for every configu
   for (const difficulty of Object.keys(modes) as Difficulty[]) {
     const config = modes[difficulty]
     for (let agents = 3; agents <= 6; agents++) {
-      for (let attempt = 0; attempt < 20; attempt++) {
+      for (let attempt = 0; attempt < 100; attempt++) {
         const mission = createMission(difficulty, agents, random)
         expect(mission.wires).toHaveLength(config.wires)
         expect(new Set(mission.targets).size).toBe(config.cuts)
         expect(mission.pin).toHaveLength(config.digits)
         expect(mission.hands).toHaveLength(agents)
         const sizes = mission.hands.map(hand => hand.length)
+        const distributedClues = mission.hands.flat()
+        expect(new Set(distributedClues).size).toBe(distributedClues.length)
         expect(Math.min(...sizes)).toBeGreaterThan(0)
         expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1)
-        mission.targets.forEach((target, order) => {
-          const facts = mission.clues.filter(clue => clue.order === order)
-          const candidates = mission.wires.flatMap((_, i) => facts.every(clue => clue.allowed?.includes(i)) ? [i] : [])
-          expect(candidates).toEqual([target])
-          for (const hand of mission.hands) {
-            const ownFacts = facts.filter(clue => hand.includes(clue.text))
-            const ownCandidates = mission.wires.flatMap((_, i) => ownFacts.every(clue => clue.allowed?.includes(i)) ? [i] : [])
-            expect(ownCandidates).toContain(target)
-            expect(ownCandidates.length).toBeGreaterThan(1)
-          }
-        })
+        const expectedTotal = config.digits ? (agents <= 4 ? 9 : agents * 2) : agents <= 4 ? agents * 2 : 7
+        expect(distributedClues).toHaveLength(expectedTotal)
+        expect(distributedClues.every(clue => clue.split(/\s+/).length <= 14)).toBe(true)
+        const sequences = possibleCuts(config.wires, config.cuts)
+        const signatures = mission.clues.map(clue => sequences.map(sequence => Number(clue.accepts(sequence))).join(''))
+        expect(new Set(signatures).size).toBe(signatures.length)
+        expect(sequences.filter(sequence => mission.clues.every(clue => clue.accepts(sequence)))).toEqual([mission.targets])
+        for (const hand of mission.hands) {
+          const ownFacts = mission.clues.filter(clue => hand.includes(clue.text))
+          const ownCandidates = sequences.filter(sequence => ownFacts.every(clue => clue.accepts(sequence)))
+          mission.targets.forEach((_, order) => expect(new Set(ownCandidates.map(sequence => sequence[order])).size).toBeGreaterThan(1))
+          expect(hand.filter(clue => clue.startsWith('Digit')).length).toBeLessThanOrEqual(1)
+        }
         const red = mission.wires.filter(color => color === 'Merah').length
-        expect(mission.pin).toBe(`${mission.serial[0]}${red + 2}${mission.serial[2]}`.slice(0, config.digits))
+        const yellow = mission.wires.indexOf('Kuning')
+        const middle = yellow >= 0 && yellow === mission.wires.lastIndexOf('Kuning') ? yellow + 1 : mission.serial[1]
+        expect(mission.pin).toBe(`${red}${middle}${mission.serial[2]}`.slice(0, config.digits))
         expect(solved(mission, config.cuts, true)).toBe(true)
         expect(solved(mission, config.cuts - 1, true)).toBe(false)
         expect(solved(mission, config.cuts, false)).toBe(config.digits === 0)
       }
     }
   }
-})
+}, 30000)

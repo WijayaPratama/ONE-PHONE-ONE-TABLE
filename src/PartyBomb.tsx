@@ -154,7 +154,7 @@ export default function PartyBomb() {
         <li><b>Baca clue secara bergantian.</b> Oper HP ke setiap agen. Tahan tombol untuk membaca clue pribadi. Kamu bisa menahannya lagi sampai menekan Lanjut.</li>
         <li><b>Gabungkan clue.</b> Timer mulai begitu kamu menekan Mulai Penjinakan. Sebutkan clue masing-masing dan gabungkan untuk menjinakkan bom.</li>
         <li><b>Bedakan urutan potong dan label kabel.</b> “Kabel ke-1” adalah kabel yang dipotong pertama. A, B, C, dan seterusnya adalah label kabel di layar. Jika kabel ke-1 adalah C, pilih kabel C lalu tekan tombol potong.</li>
-        <li><b>Selesaikan misi.</b> Easy membutuhkan satu potongan, Medium dua potongan berurutan, Hard satu potongan dan PIN, dan Impossible dua potongan berurutan dan PIN. Jika ada PIN, kamu bebas mengerjakan modul kabel atau PIN lebih dulu.</li>
+        <li><b>Selesaikan misi.</b> Easy membutuhkan satu potongan dan Medium dua potongan berurutan. Hard membutuhkan satu potongan dan PIN 3 digit, sedangkan Impossible membutuhkan dua potongan berurutan dan PIN 3 digit. Jika ada PIN, modul kabel atau PIN boleh dikerjakan lebih dulu.</li>
         <li><b>Periksa sebelum konfirmasi.</b> Salah kabel, urutan potong terbalik, PIN salah saat menekan OK, atau waktu habis akan mengakhiri misi.</li>
         <li><b>Kenali posisi ganjil dan genap.</b> Hitung dari kabel paling atas: A adalah posisi 1, B posisi 2, C posisi 3, dan seterusnya. Jadi A, C, E berada di posisi ganjil, sedangkan B, D, F di posisi genap.</li>
       </ol>
