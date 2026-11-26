@@ -30,8 +30,15 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
   const clues: Clue[] = []
   targets.forEach((target, order) => {
     const label = `Kabel ke-${order + 1}`
-    const alternatives = positions.filter(i => i !== target)
-    const groups = Array.from({ length: Math.min(agents, alternatives.length) }, () => [] as number[])
+    const neighbor = wires[target === 0 ? 1 : target - 1]
+    const patterns = [
+      { text: `berada di posisi ${target % 2 === 0 ? 'ganjil' : 'genap'}.`, allowed: positions.filter(i => i % 2 === target % 2) },
+      { text: `bersebelahan langsung dengan kabel ${neighbor.toUpperCase()}.`, allowed: positions.filter(i => wires[i - 1] === neighbor || wires[i + 1] === neighbor) },
+    ].filter(pattern => pattern.allowed.length > 1 && pattern.allowed.length < positions.length)
+    const pattern = patterns[index(patterns.length)]
+    clues.push({ order, text: `${label} ${pattern.text}`, allowed: pattern.allowed })
+    const alternatives = pattern.allowed.filter(i => i !== target)
+    const groups = Array.from({ length: Math.min(agents - 1, alternatives.length) }, () => [] as number[])
     for (let i = 0; alternatives.length; i++) {
       const [alternative] = alternatives.splice(index(alternatives.length), 1)
       groups[i % groups.length].push(alternative)
@@ -48,8 +55,8 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
     { digit: serial[2], text: 'Digit PIN ke-3 adalah angka terakhir nomor seri.' },
   ].slice(0, config.digits)
   const facts = [...clues, ...pinFacts]
-  // Easy can have more agents than incorrect wires. Give extra agents a corroborating clue.
-  while (facts.length < agents) facts.push(clues[facts.length - clues.length])
+  // Small puzzles may need corroborating clues so every agent receives a card.
+  for (let i = 0; facts.length < agents; i++) facts.push(clues[i % clues.length])
   const hands = Array.from({ length: agents }, () => [] as string[])
   const offset = index(agents)
   facts.forEach((clue, i) => hands[(i + offset) % agents].push(clue.text))

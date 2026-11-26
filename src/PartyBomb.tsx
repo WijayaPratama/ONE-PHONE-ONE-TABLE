@@ -151,11 +151,12 @@ export default function PartyBomb() {
     <dialog ref={help} aria-labelledby="bomb-help" className="w-[calc(100%-2rem)] max-w-lg rounded-xl border border-slate-600 bg-slate-900 p-5 text-slate-100 backdrop:bg-black/75">
       <h2 id="bomb-help" className="text-xl font-bold text-amber-300">Cara Main</h2>
       <ol className="my-4 list-decimal space-y-3 pl-5">
-        <li><b>Baca clue bergantian.</b> Oper HP. Setiap agen menahan tombol untuk membaca clue sendiri dan bisa membacanya ulang sampai menekan Lanjut.</li>
-        <li><b>Gabungkan clue.</b> Timer langsung berjalan saat menekan Mulai Penjinakan. Sebutkan petunjuk masing-masing dan sepakati pilihan tim.</li>
-        <li><b>Bedakan urutan potong dan label kabel.</b> “Kabel ke-1” adalah kabel yang dipotong dulu. Label A, B, C, dan seterusnya mengikuti urutan dari atas. Jika kabel ke-1 adalah C, pilih C lalu tekan tombol potong.</li>
-        <li><b>Selesaikan modul.</b> Easy meminta satu potongan; Medium dua potongan berurutan. Hard meminta satu potongan dan PIN; Impossible dua potongan berurutan dan PIN. Jika ada PIN, modul mana pun boleh dikerjakan dulu.</li>
-        <li><b>Periksa sebelum konfirmasi.</b> Kabel salah, urutan terbalik, PIN salah saat menekan OK, atau timer habis akan mengakhiri misi.</li>
+        <li><b>Baca clue secara bergantian.</b> Oper HP ke setiap agen. Tahan tombol untuk membaca clue pribadi. Kamu bisa menahannya lagi sampai menekan Lanjut.</li>
+        <li><b>Gabungkan clue.</b> Timer mulai begitu kamu menekan Mulai Penjinakan. Sebutkan clue masing-masing dan gabungkan untuk menjinakkan bom.</li>
+        <li><b>Bedakan urutan potong dan label kabel.</b> “Kabel ke-1” adalah kabel yang dipotong pertama. A, B, C, dan seterusnya adalah label kabel di layar. Jika kabel ke-1 adalah C, pilih kabel C lalu tekan tombol potong.</li>
+        <li><b>Selesaikan misi.</b> Easy membutuhkan satu potongan, Medium dua potongan berurutan, Hard satu potongan dan PIN, dan Impossible dua potongan berurutan dan PIN. Jika ada PIN, kamu bebas mengerjakan modul kabel atau PIN lebih dulu.</li>
+        <li><b>Periksa sebelum konfirmasi.</b> Salah kabel, urutan potong terbalik, PIN salah saat menekan OK, atau waktu habis akan mengakhiri misi.</li>
+        <li><b>Kenali posisi ganjil dan genap.</b> Hitung dari kabel paling atas: A adalah posisi 1, B posisi 2, C posisi 3, dan seterusnya. Jadi A, C, E berada di posisi ganjil, sedangkan B, D, F di posisi genap.</li>
       </ol>
       <form method="dialog"><button className="btn-primary !bg-amber-400 !text-slate-950">Mengerti</button></form>
     </dialog>
