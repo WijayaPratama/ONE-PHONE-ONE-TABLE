@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { createMission, modes, solved, tempos, wireColors, type Difficulty, type Mission, type Tempo } from './partyBombLogic'
+import { createMission, modes, solved, tempos, wireColors, wireLabel, type Difficulty, type Mission, type Tempo } from './partyBombLogic'
 
 type Phase = 'setup' | 'clues' | 'console' | 'result'
 type Result = 'success' | 'wire' | 'pin' | 'timeout'
@@ -9,8 +9,7 @@ export default function PartyBomb() {
   const [names, setNames] = useState(['', '', '', ''])
   const [difficulty, setDifficulty] = useState<Difficulty>('Medium')
   const [tempo, setTempo] = useState<Tempo>('Normal')
-  const [sound, setSound] = useState(true)
-  const [help, setHelp] = useState(false)
+  const help = useRef<HTMLDialogElement>(null)
   const [mission, setMission] = useState<Mission>()
   const [agent, setAgent] = useState(0)
   const [showClue, setShowClue] = useState(false)
@@ -28,7 +27,6 @@ export default function PartyBomb() {
   const name = (i: number) => names[i].trim() || `Agen ${i + 1}`
 
   function beep(hz: number, duration = 0.1, type: OscillatorType = 'sine') {
-    if (!sound) return
     try {
       const ctx = audio.current ??= new AudioContext()
       if (ctx.state === 'suspended') void ctx.resume().catch(() => {})
@@ -67,7 +65,7 @@ export default function PartyBomb() {
     const id = window.setInterval(tick, 50)
     document.addEventListener('visibilitychange', tick)
     return () => { window.clearInterval(id); document.removeEventListener('visibilitychange', tick) }
-  }, [phase, deadline, sound])
+  }, [phase, deadline])
 
   useEffect(() => {
     const release = () => {
@@ -147,13 +145,20 @@ export default function PartyBomb() {
       <p className="font-mono text-sm font-bold text-amber-300">◆ PARTY BOMB DEFUSED</p>
       <div className="flex flex-wrap gap-2">
         {phase === 'setup' && <a href="#games" className="rounded-lg border border-slate-700 px-3 py-2 text-sm">Menu game</a>}
-        <button className="rounded-lg border border-slate-700 px-3 py-2 text-sm" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Suara aktif' : 'Suara mati'}</button>
-        {phase !== 'console' && <button className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-amber-300" onClick={() => setHelp(!help)}>Cara main</button>}
+        {phase !== 'console' && <button className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-amber-300" onClick={() => help.current?.showModal()}>Cara Main</button>}
       </div>
     </header>
-    {help && phase !== 'console' && <section className="card mb-4">
-      Oper HP dan hafalkan petunjuk masing-masing. Setelah timer mulai, gabungkan petunjuk secara lisan. Potong kabel sesuai urutan dan selesaikan PIN jika tersedia. Satu kesalahan mengakhiri simulasi.
-    </section>}
+    <dialog ref={help} aria-labelledby="bomb-help" className="w-[calc(100%-2rem)] max-w-lg rounded-xl border border-slate-600 bg-slate-900 p-5 text-slate-100 backdrop:bg-black/75">
+      <h2 id="bomb-help" className="text-xl font-bold text-amber-300">Cara Main</h2>
+      <ol className="my-4 list-decimal space-y-3 pl-5">
+        <li><b>Baca clue bergantian.</b> Oper HP. Setiap agen menahan tombol untuk membaca clue sendiri dan bisa membacanya ulang sampai menekan Lanjut.</li>
+        <li><b>Gabungkan clue.</b> Timer langsung berjalan saat menekan Mulai Penjinakan. Sebutkan petunjuk masing-masing dan sepakati pilihan tim.</li>
+        <li><b>Bedakan urutan potong dan label kabel.</b> “Kabel ke-1” adalah kabel yang dipotong dulu. Label A, B, C, dan seterusnya mengikuti urutan dari atas. Jika kabel ke-1 adalah C, pilih C lalu tekan tombol potong.</li>
+        <li><b>Selesaikan modul.</b> Easy meminta satu potongan; Medium dua potongan berurutan. Hard meminta satu potongan dan PIN; Impossible dua potongan berurutan dan PIN. Jika ada PIN, modul mana pun boleh dikerjakan dulu.</li>
+        <li><b>Periksa sebelum konfirmasi.</b> Kabel salah, urutan terbalik, PIN salah saat menekan OK, atau timer habis akan mengakhiri misi.</li>
+      </ol>
+      <form method="dialog"><button className="btn-primary !bg-amber-400 !text-slate-950">Mengerti</button></form>
+    </dialog>
     {phase === 'setup' && <section className="space-y-4">
       <div className="py-4 text-center">
         <p className="font-mono text-sm tracking-wider text-amber-300">SIMULASI KERJA SAMA · 3–6 AGEN</p>
@@ -178,6 +183,9 @@ export default function PartyBomb() {
     </section>}
     {phase === 'clues' && mission && <section className="space-y-4">
       <p className="font-mono text-sm text-amber-300">DISTRIBUSI INTELIJEN · {agent + 1}/{names.length}</p>
+      <p className="text-sm text-slate-300">{mission.targets.length === 1
+        ? 'Kabel ke-1 adalah satu-satunya kabel yang harus dipotong.'
+        : 'Kabel ke-1 harus dipotong pertama. Setelah itu, potong Kabel ke-2.'}</p>
       <progress className="w-full accent-amber-400" value={agent + 1} max={names.length} />
       <div className="card text-center"><p className="text-slate-300">Serahkan HP kepada</p><h1 className="text-2xl font-black text-amber-300">{name(agent)}</h1></div>
       <div className="min-h-40 rounded-xl border border-dashed border-slate-600 bg-slate-900 p-4">
@@ -202,8 +210,8 @@ export default function PartyBomb() {
       <div className={`grid gap-3 ${mission.pin ? 'min-[400px]:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]' : ''}`}>
         <section className="card !p-3">
           <h2 className="mb-2 font-mono text-sm font-bold text-amber-300">MODUL KABEL</h2>
-          <div className="space-y-2">{mission.wires.map((color, i) => <button key={i} aria-pressed={chosen === i} disabled={mission.targets.slice(0, cuts).includes(i) || cuts === mission.targets.length} onClick={() => setChosen(i)} className={`flex min-h-11 w-full items-center gap-2 rounded-lg border px-2 text-sm disabled:opacity-40 ${chosen === i ? 'border-amber-300 bg-amber-950' : 'border-slate-700 bg-slate-950'}`}><b>#{i + 1}</b><span className="flex-1 rounded px-1 text-center font-mono font-black text-slate-950" style={{ background: wireColors[color] }}>{color.toUpperCase()}</span></button>)}</div>
-          <button className="btn-primary mt-3 !bg-amber-400 !px-2 !text-slate-950" disabled={chosen === undefined || cuts === mission.targets.length} onClick={cut}>{cuts === mission.targets.length ? 'Kabel selesai' : `Potong Kabel Ke-${cuts + 1}`}</button>
+          <div className="space-y-2">{mission.wires.map((color, i) => <button key={i} aria-pressed={chosen === i} disabled={mission.targets.slice(0, cuts).includes(i) || cuts === mission.targets.length} onClick={() => setChosen(i)} className={`flex min-h-11 w-full items-center gap-2 rounded-lg border px-2 text-sm disabled:opacity-40 ${chosen === i ? 'border-amber-300 bg-amber-950' : 'border-slate-700 bg-slate-950'}`}><b>{wireLabel(i)}</b><span className="flex-1 rounded px-1 text-center font-mono font-black text-slate-950" style={{ background: wireColors[color] }}>{color.toUpperCase()}</span></button>)}</div>
+          <button className="btn-primary mt-3 !bg-amber-400 !px-2 !text-slate-950" disabled={chosen === undefined || cuts === mission.targets.length} onClick={cut}>{cuts === mission.targets.length ? 'Kabel selesai' : chosen === undefined ? 'Pilih kabel' : `Potongan ${cuts + 1}: Potong Kabel ${wireLabel(chosen)}`}</button>
         </section>
         {mission.pin && <section className="card !p-3">
           <h2 className="mb-2 font-mono text-sm font-bold text-sky-300">MODUL PIN</h2>
@@ -221,7 +229,7 @@ export default function PartyBomb() {
         <p className="mt-2">{result === 'success' ? `Sisa waktu ${format(remaining)} detik.` : result === 'wire' ? 'Kabel yang dipotong salah atau urutannya terbalik.' : result === 'pin' ? 'Kode PIN salah.' : 'Waktu habis.'}</p>
       </div>
       <div className="card"><h2 className="font-bold text-amber-300">Kunci misi · Seri {mission.serial}</h2>
-        <ol className="mt-2 space-y-1">{mission.targets.map((i, order) => <li key={i}>Kabel ke-{order + 1}: #{i + 1} {mission.wires[i]}</li>)}</ol>
+        <ol className="mt-2 space-y-1">{mission.targets.map((i, order) => <li key={i}>Kabel ke-{order + 1}: {wireLabel(i)} · {mission.wires[i]}</li>)}</ol>
         {mission.pin && <p className="mt-2">PIN: <b className="font-mono text-sky-300">{mission.pin}</b></p>}
       </div>
       <div className="card"><h2 className="font-bold">Rangkuman clue</h2><div className="mt-2 max-h-64 space-y-3 overflow-auto">

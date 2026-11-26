@@ -10,6 +10,7 @@ export type Tempo = keyof typeof tempos
 const colors = ['Merah', 'Biru', 'Kuning', 'Hijau', 'Ungu', 'Putih'] as const
 export const wireColors = { Merah: '#f87171', Biru: '#60a5fa', Kuning: '#facc15', Hijau: '#34d399', Ungu: '#c084fc', Putih: '#e2e8f0' }
 export type WireColor = typeof colors[number]
+export const wireLabel = (index: number) => String.fromCharCode(65 + index)
 
 export interface Clue {
   text: string
@@ -33,12 +34,12 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
       const allowed = positions.filter(predicate)
       if (allowed.length < wires.length) clues.push({ order, text: `${label} ${text}`, allowed })
     }
-    excludes(`berada di posisi ${target % 2 === 0 ? 'ganjil' : 'genap'}.`, i => i % 2 === target % 2)
+    const group = positions.filter(i => i % 2 === target % 2).map(wireLabel).join(', ')
+    excludes(`termasuk salah satu dari kabel ${group}.`, i => i % 2 === target % 2)
     const neighbor = wires[target === 0 ? 1 : target - 1]
     excludes(`bersebelahan dengan kabel ${neighbor.toUpperCase()}.`, i => wires[i - 1] === neighbor || wires[i + 1] === neighbor)
     positions.filter(i => i !== target).forEach(i => {
-      const color = wires[i]
-      excludes(color === wires[target] ? `bukan kabel #${i + 1}.` : `bukan ${color.toUpperCase()} pada posisi #${i + 1}.`, j => j !== i)
+      excludes(`bukan kabel ${wireLabel(i)}.`, j => j !== i)
     })
   })
   const pinFacts = [
