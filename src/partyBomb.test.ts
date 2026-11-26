@@ -20,6 +20,12 @@ it('generates unambiguous cable sequences, PINs and clue hands for every configu
           const facts = mission.clues.filter(clue => clue.order === order)
           const candidates = mission.wires.flatMap((_, i) => facts.every(clue => clue.allowed?.includes(i)) ? [i] : [])
           expect(candidates).toEqual([target])
+          for (const hand of mission.hands) {
+            const ownFacts = facts.filter(clue => hand.includes(clue.text))
+            const ownCandidates = mission.wires.flatMap((_, i) => ownFacts.every(clue => clue.allowed?.includes(i)) ? [i] : [])
+            expect(ownCandidates).toContain(target)
+            expect(ownCandidates.length).toBeGreaterThan(1)
+          }
         })
         const red = mission.wires.filter(color => color === 'Merah').length
         expect(mission.pin).toBe(`${mission.serial[0]}${red + 2}${mission.serial[2]}`.slice(0, config.digits))

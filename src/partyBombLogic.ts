@@ -30,16 +30,16 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
   const clues: Clue[] = []
   targets.forEach((target, order) => {
     const label = `Kabel ke-${order + 1}`
-    const excludes = (text: string, predicate: (i: number) => boolean) => {
-      const allowed = positions.filter(predicate)
-      if (allowed.length < wires.length) clues.push({ order, text: `${label} ${text}`, allowed })
+    const alternatives = positions.filter(i => i !== target)
+    const groups = Array.from({ length: Math.min(agents, alternatives.length) }, () => [] as number[])
+    for (let i = 0; alternatives.length; i++) {
+      const [alternative] = alternatives.splice(index(alternatives.length), 1)
+      groups[i % groups.length].push(alternative)
     }
-    const group = positions.filter(i => i % 2 === target % 2).map(wireLabel).join(', ')
-    excludes(`termasuk salah satu dari kabel ${group}.`, i => i % 2 === target % 2)
-    const neighbor = wires[target === 0 ? 1 : target - 1]
-    excludes(`bersebelahan dengan kabel ${neighbor.toUpperCase()}.`, i => wires[i - 1] === neighbor || wires[i + 1] === neighbor)
-    positions.filter(i => i !== target).forEach(i => {
-      excludes(`bukan kabel ${wireLabel(i)}.`, j => j !== i)
+    // Each group goes to a different agent, and every group removes a separate set of alternatives.
+    groups.forEach(group => {
+      const labels = group.sort((a, b) => a - b).map(wireLabel).join(' atau ')
+      clues.push({ order, text: `${label} bukan kabel ${labels}.`, allowed: positions.filter(i => !group.includes(i)) })
     })
   })
   const pinFacts = [
@@ -48,7 +48,8 @@ export function createMission(difficulty: Difficulty, agents: number, random = M
     { digit: serial[2], text: 'Digit PIN ke-3 adalah angka terakhir nomor seri.' },
   ].slice(0, config.digits)
   const facts = [...clues, ...pinFacts]
-  if (facts.length < agents) facts.push({ text: `Nomor seri misi ini berakhir dengan ${serial[2]}.` })
+  // Easy can have more agents than incorrect wires. Give extra agents a corroborating clue.
+  while (facts.length < agents) facts.push(clues[facts.length - clues.length])
   const hands = Array.from({ length: agents }, () => [] as string[])
   const offset = index(agents)
   facts.forEach((clue, i) => hands[(i + offset) % agents].push(clue.text))
